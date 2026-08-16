@@ -1,0 +1,8 @@
+image:
+  repository: ghcr.io/matter-js/matterjs-server
+  digest: sha256:54232d0d3e7dff5a54759469d2753399270412b4c30c55b31750a4595e4cb236 # stable, confirmed live via docker buildx imagetools inspect 2026-08-16
+
+verify:
+  image:
+    repository: alpine
+    digest: sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc # 3.20

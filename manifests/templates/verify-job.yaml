@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: matter-server-verify
+  namespace: matter-server
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: verify
+          image: "{{ .Values.verify.image.repository }}@{{ .Values.verify.image.digest }}"
+          command: ["/bin/sh", "/scripts/verify.sh"]
+          volumeMounts:
+            - name: script
+              mountPath: /scripts
+      volumes:
+        - name: script
+          configMap:
+            name: matter-server-verify-script
+            defaultMode: 0555

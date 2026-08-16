@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: matter-server-verify-checksum
+  namespace: matter-server
+data:
+  checksum: {{ (.Files.Glob "scripts/*").AsConfig | sha256sum | quote }}
