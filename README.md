@@ -22,7 +22,9 @@ two pods must be co-located.
 
 Co-location is enforced with required pod affinity on Home Assistant's
 pod label (`app: home-assistant`, `topologyKey:
-kubernetes.io/hostname`), not a hardcoded `nodeSelector`. Home
+kubernetes.io/hostname`, `namespaces: ["home-assistant"]` since pod
+affinity only matches same-namespace pods by default and this
+Deployment lives in `matter-server`), not a hardcoded `nodeSelector`. Home
 Assistant's own Deployment has no `nodeSelector` — it schedules wherever
 the cluster puts it, so pinning this pod to a fixed hostname would be
 brittle: if Home Assistant ever moved (e.g. new nodes joining and
