@@ -17,8 +17,13 @@ spec:
     spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
-      nodeSelector:
-        kubernetes.io/hostname: imac
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: home-assistant
+              topologyKey: kubernetes.io/hostname
       containers:
         - name: matter-server
           image: "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
