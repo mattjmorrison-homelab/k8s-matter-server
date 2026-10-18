@@ -14,19 +14,27 @@ backend. This homelab's `homelab-home-assistant` tracks a floating
 
 `hostNetwork: true`, same requirement Home Assistant already has — Matter
 commissioning depends on mDNS and IPv6 link-local multicast, which don't
-traverse flannel's bridge networking. `nodeSelector:
-kubernetes.io/hostname: imac` pins it to the same node Home Assistant
-runs on: with both pods on `hostNetwork: true`, there's no cluster-DNS
-Service in the loop for this connection — a hostNetwork pod binds
-directly to the node's real interface, so HA can only reach this over an
-address actually routable on that shared node.
+traverse flannel's bridge networking. With both pods on `hostNetwork:
+true`, there's no cluster-DNS Service in the loop for this connection —
+a hostNetwork pod binds directly to the node's real interface, so HA can
+only reach this over an address actually routable on the same node. The
+two pods must be co-located.
 
-Home Assistant's own Deployment has no `nodeSelector` today — it's on
-`imac` incidentally, not pinned there. If it were ever rescheduled, this
-co-location (and the hardcoded Pi-hole DNS entry for
-`home-assistant.morrisons.site`) would silently break. That's a
-`homelab-home-assistant` change, not this repo's — noted here since it's
-the reason this repo's own pinning matters.
+Co-location is enforced with required pod affinity on Home Assistant's
+pod label (`app: home-assistant`, `topologyKey:
+kubernetes.io/hostname`), not a hardcoded `nodeSelector`. Home
+Assistant's own Deployment has no `nodeSelector` — it schedules wherever
+the cluster puts it, so pinning this pod to a fixed hostname would be
+brittle: if Home Assistant ever moved (e.g. new nodes joining and
+changing scheduling), this pod would stay stuck on the old node and the
+WebSocket connection would break. Affinity makes this pod follow Home
+Assistant wherever it actually runs instead.
+
+Caveat: pod affinity only matches pods that are already running at
+schedule time. If both pods cold-start simultaneously with neither yet
+up, this pod can briefly fail to schedule until Home Assistant comes up
+first. Not a correctness bug — just a startup-ordering nuance, since
+Home Assistant's Deployment has no corresponding dependency on this one.
 
 ## Storage
 
