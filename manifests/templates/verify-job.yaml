@@ -11,6 +11,14 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: home-assistant
+              namespaces: ["home-assistant"]
+              topologyKey: kubernetes.io/hostname
       containers:
         - name: verify
           image: "{{ .Values.verify.image.repository }}@{{ .Values.verify.image.digest }}"
