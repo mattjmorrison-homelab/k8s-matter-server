@@ -23,6 +23,7 @@ spec:
             - labelSelector:
                 matchLabels:
                   app: home-assistant
+              namespaces: ["home-assistant"]
               topologyKey: kubernetes.io/hostname
       containers:
         - name: matter-server
